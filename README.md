@@ -1,13 +1,22 @@
 # Privacy preserving backup scripts
 
 The Icelandic pirate party runs two privacy sensitive web-apps; wasa2il
-(policies and elections) and icepirate (the membership roster). Both of these
-apps contain sensitive data in their databases which we have an obligation to
-protect and prevent from leakage.
+(policies and elections) and icepirate (the membership roster). Both of
+these apps contain sensitive data in their databases which we have an
+obligation to protect and prevent from leakage.
 
 In particular, icepirate contains PII about members of the Icelandic
-Pirate Party and its affiliates, while wasa2il contains user-identifiable
-ballots while elections are in process and have not been finalized.
+Pirate Party and its affiliates, while wasa2il contains
+user-identifiable ballots while elections are in process and have not
+been finalized.
+
+As all this data is very important, we need good automated backups.
+
+However, we don't want the backups to unduly weaken peoples' privacy or
+reduce the anonymity of elections. These scripts therefor implement a
+backup policy where the local admin only has access to the latest 24
+hours worth of backups, but a "write only" historic copy is encrypted
+stored offsite.
 
 
 ## Backup goals
@@ -22,11 +31,11 @@ ballots while elections are in process and have not been finalized.
 
 1. Create MySQL dumps and tar archives in `~/backups.insecure/latest`.
 2. Encrypt these dumps with the public PGP key of chosen trusted
-   parties and store in `backups/dayN` and `backups/wkM`.
-3. Synchronize the `backups/` folder to remote storage using rsync.
+   parties and store in `~/backups/dayN` and `~/backups/wkM`.
+3. Synchronize the `~/backups/` folder to remote storage using rsync.
 4. Run backups once per day (via cron), or on-demand before upgrades
 
-Details / rationale:
+### Details & rationale
 
 The first step satisfies goals #1 and #2, in that an admin performing an
 upgrade or other system operation can trigger a backup which they can
