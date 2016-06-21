@@ -28,12 +28,12 @@ ballots while elections are in process and have not been finalized.
 
 Details / rationale:
 
-The first step satisfies goals #1 and #2, in that an admin performing
-an upgrade or other system operation can trigger a backup which he can
+The first step satisfies goals #1 and #2, in that an admin performing an
+upgrade or other system operation can trigger a backup which they can
 then use to roll-back if the upgrade causes problems.
 
 The second step satisfies goal #4, protecting user and election privacy
-by only keeping historic backups that have been encrypted. Generally the
+by only keeping historic backups that have been encrypted. Ideally the
 PGP keys in use should not be accessible to the administrators or
 developers of the system.
 
@@ -45,5 +45,5 @@ backups for recent states.
 Step three protects us against hardware failure of member.piratar.is,
 satisfying goal #3.
 
-Step #4 makes sure this doesn't get forgotten.
+Step four makes sure all this doesn't get forgotten.
 
