@@ -13,10 +13,10 @@ been finalized.
 As all this data is very important, we need good automated backups.
 
 However, we don't want the backups to unduly weaken peoples' privacy or
-reduce the anonymity of elections. These scripts therefor implement a
+reduce the anonymity of elections. These scripts therefore implement a
 backup policy where the local admin only has access to the latest 24
 hours worth of backups, but a "write only" historic copy is encrypted
-stored offsite.
+and stored off-site.
 
 
 ## Backup goals
