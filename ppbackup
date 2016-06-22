@@ -52,6 +52,6 @@ rm -rf backups/$WEEK
 mkdir -p backups/$WEEK
 ln backups/$DAY/*mysql* backups/$DAY/*files* backups/$WEEK
 
-# Push to copy of encrypted backups to remote server
+# Push copy of encrypted backups to remote server
 cd ~
 exec rsync -qar --delete backups $BACKUP_REMOTE
