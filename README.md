@@ -56,3 +56,30 @@ satisfying goal #3.
 
 Step four makes sure all this doesn't get forgotten.
 
+
+## Configuration
+
+An example `~/ppbackup.cfg` file might look like this:
+
+    # This is the configuration for ~/bin/backup-scripts/ppbackup
+    #
+    BACKUP_NAME=myapp
+    BACKUP_REMOTE=backupuser@example.com:backup-folder
+    BACKUP_FILES="myapp logs tools"
+    BACKUP_BINARIES="virtualenv"
+    BACKUP_MYSQL_DB="myappdb"
+    BACKUP_GPG_RECIPIENT="trustedperson@example.com"
+
+Currently all variables have to be set for the script to run. Note that
+the `BACKUP_BINARIES` will only be preserved in daily backups, not in
+the more long-lived weeklies.
+
+This configuration relies on the following also being configured:
+
+   1. `~/.my.cnf` must have the user and password for `myappdb`
+   2. The user's GnuPG key-chain must have a trusted key public key
+      for `trustedperson@example.com`.
+   3. The user must have a public SSH key which is in `~/.ssh/authorized_keys`
+      on the `backupuser@example.com` account.
+
+That's all, folks!
