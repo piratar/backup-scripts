@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Load config file, verify we are configured
+. ~/ppbackup.cfg 2>/dev/null
+if [ "$BACKUP_NAME" = "" -o \
+     "$BACKUP_REMOTE" = "" -o \
+     "$BACKUP_GPG_RECIPIENT" = "" -o \
+     "$BACKUP_FILES" = "" -o \
+     "$BACKUP_BINARIES" = "" -o \
+     "$BACKUP_MYSQL_DB" = "" ]
+then
+    echo "Please configure ~/ppbackup.cfg and ~/.my.cnf"
+    exit 1
+fi
+
+# Set time-related variables
+WEEK=$(date +wk%g)
+DAY=$(date +day%u)
+TIME=$(date +%H%M)
+
+# Make room
+cd ~
+rm -rf backups.insecure/latest
+mkdir -p backups/$DAY backups.insecure/latest
+find backups/$DAY -mtime +2 |xargs rm -f
+
+# Create initial backups, unencrypted
+mysqldump $BACKUP_MYSQL_DB 2>/dev/null \
+  |nice bzip2 \
+  > backups.insecure/latest/$BACKUP_NAME-mysql-$TIME.dump.bz2
+
+crontab -l >bin/crontab
+tar c $BACKUP_FILES \
+  |nice bzip2 \
+  >backups.insecure/latest/$BACKUP_NAME-files-$TIME.tar.bz2
+
+tar c $BACKUP_BINARIES \
+  |nice bzip2 \
+  >backups.insecure/latest/$BACKUP_NAME-binaries-$TIME.tar.bz2
+
+# Create encrypted copies
+for bkup in $BACKUP_NAME-mysql-$TIME.dump.bz2 \
+            $BACKUP_NAME-binaries-$TIME.tar.bz2 \
+            $BACKUP_NAME-files-$TIME.tar.bz2; do
+  nice gpg --batch -e -r $BACKUP_GPG_RECIPIENT \
+    <backups.insecure/latest/$bkup 2>/dev/null \
+    >backups/$DAY/$bkup.gpg
+done
+
+# Create weekly backups; skipping the binaries to save space
+rm -rf backups/$WEEK
+mkdir -p backups/$WEEK
+ln backups/$DAY/*mysql* backups/$DAY/*files* backups/$WEEK
+
+# Push to copy of encrypted backups to remote server
+cd ~
+exec rsync -qar --delete backups $BACKUP_REMOTE
