@@ -54,4 +54,4 @@ ln backups/$DAY/*mysql* backups/$DAY/*files* backups/$WEEK
 
 # Push copy of encrypted backups to remote server
 cd ~
-exec rsync -qar --delete backups $BACKUP_REMOTE
+rsync -qar backups $BACKUP_REMOTE
