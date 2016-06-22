@@ -16,7 +16,7 @@ fi
 # Set time-related variables
 WEEK=$(date +wk%g)
 DAY=$(date +day%u)
-TIME=$(date +%H%M)
+TIME=$(date +%Hxx)
 
 # Make room
 cd ~
