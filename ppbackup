@@ -6,8 +6,7 @@ if [ "$BACKUP_NAME" = "" -o \
      "$BACKUP_REMOTE" = "" -o \
      "$BACKUP_GPG_RECIPIENT" = "" -o \
      "$BACKUP_FILES" = "" -o \
-     "$BACKUP_BINARIES" = "" -o \
-     "$BACKUP_MYSQL_DB" = "" ]
+     "$BACKUP_BINARIES" = "" ]
 then
     echo "Please configure ~/ppbackup.cfg and ~/.my.cnf"
     exit 1
@@ -25,32 +24,42 @@ mkdir -p backups/$DAY backups.insecure/latest
 find backups/$DAY -mtime +2 |xargs rm -f
 
 # Create initial backups, unencrypted
-mysqldump $BACKUP_MYSQL_DB 2>/dev/null \
-  |nice bzip2 \
-  > backups.insecure/latest/$BACKUP_NAME-mysql-$TIME.dump.bz2
+if [ "$BACKUP_MYSQL_DB" != "" ]; then
+  mysqldump $BACKUP_MYSQL_DB 2>/dev/null \
+    |nice bzip2 \
+    > backups.insecure/latest/$BACKUP_NAME-mysql-$TIME.dump.bz2
+fi
+
+if [ "$BACKUP_PSQL_DB" != "" ]; then
+  pg_dump $BACKUP_PSQL_DB 2>/dev/null \
+    |nice bzip2 \
+    > backups.insecure/latest/$BACKUP_NAME-psql-$TIME.dump.bz2
+fi
 
 crontab -l >bin/crontab
-tar c $BACKUP_FILES \
+tar c $BACKUP_FILES 2>/dev/null \
   |nice bzip2 \
   >backups.insecure/latest/$BACKUP_NAME-files-$TIME.tar.bz2
 
-tar c $BACKUP_BINARIES \
+tar c $BACKUP_BINARIES 2>/dev/null \
   |nice bzip2 \
   >backups.insecure/latest/$BACKUP_NAME-binaries-$TIME.tar.bz2
 
 # Create encrypted copies
 for bkup in $BACKUP_NAME-mysql-$TIME.dump.bz2 \
+            $BACKUP_NAME-psql-$TIME.dump.bz2 \
             $BACKUP_NAME-binaries-$TIME.tar.bz2 \
             $BACKUP_NAME-files-$TIME.tar.bz2; do
-  nice gpg --batch -e -r $BACKUP_GPG_RECIPIENT \
-    <backups.insecure/latest/$bkup 2>/dev/null \
-    >backups/$DAY/$bkup.gpg
+  [ -e backups.insecure/latest/$bkup ] && \
+    nice gpg --batch -e -r $BACKUP_GPG_RECIPIENT \
+      <backups.insecure/latest/$bkup 2>/dev/null \
+      >backups/$DAY/$bkup.gpg
 done
 
 # Create weekly backups; skipping the binaries to save space
 rm -rf backups/$WEEK
 mkdir -p backups/$WEEK
-ln backups/$DAY/*mysql* backups/$DAY/*files* backups/$WEEK
+ln backups/$DAY/*sql* backups/$DAY/*files* backups/$WEEK
 
 # Push copy of encrypted backups to remote server
 cd ~

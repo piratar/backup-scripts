@@ -29,7 +29,7 @@ and stored off-site.
 
 ## Backup strategy
 
-1. Create MySQL dumps and tar archives in `~/backups.insecure/latest`.
+1. Create MySQL/PostgreSQL dumps and tar archives in `~/backups.insecure/latest`.
 2. Encrypt these dumps with the public PGP key of chosen trusted
    parties and store in `~/backups/dayN` and `~/backups/wkM`.
 3. Synchronize the `~/backups/` folder to remote storage using rsync.
@@ -68,15 +68,18 @@ An example `~/ppbackup.cfg` file might look like this:
     BACKUP_FILES="myapp logs tools"
     BACKUP_BINARIES="virtualenv"
     BACKUP_MYSQL_DB="myappdb"
+    # or: BACKUP_PSQL_DB="myappdb"
     BACKUP_GPG_RECIPIENT="trustedperson@example.com"
 
-Currently all variables have to be set for the script to run. Note that
-the `BACKUP_BINARIES` will only be preserved in daily backups, not in
-the more long-lived weeklies.
+Currently all variables have to be set for the script to run except for
+the SQL database variables, they are optional as most people will only
+be using one or the other (or neither). Note that the `BACKUP_BINARIES`
+will only be preserved in daily backups, not in the more long-lived
+weeklies.
 
 This configuration relies on the following also being configured:
 
-   1. `~/.my.cnf` must have the user and password for `myappdb`
+   1. `~/.my.cnf` or `~/.pgpass` must have credentials for `myappdb`
    2. The user's GnuPG key-chain must have a trusted key public key
       for `trustedperson@example.com`.
    3. The user must have a public SSH key which is in `~/.ssh/authorized_keys`
