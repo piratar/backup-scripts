@@ -14,7 +14,7 @@ then
 fi
 
 # Set time-related variables
-WEEK=$(date +wk%g)
+WEEK=$(date +wk%U)
 DAY=$(date +day%u)
 TIME=$(date +%Hxx)
 
