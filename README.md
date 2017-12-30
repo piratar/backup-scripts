@@ -32,7 +32,8 @@ and stored off-site.
 1. Create MySQL/PostgreSQL dumps and tar archives in `~/backups.insecure/latest`.
 2. Encrypt these dumps with the public PGP key of chosen trusted
    parties and store in `~/backups/dayN` and `~/backups/wkM`.
-3. Synchronize the `~/backups/` folder to remote storage using rsync.
+3. Synchronize the `~/backups/` folder to remote storage using rsync and
+   send an email to admins indicating success or failure.
 4. Run backups once per day (via cron), or on-demand before upgrades
 
 ### Details & rationale
@@ -70,6 +71,7 @@ An example `~/ppbackup.cfg` file might look like this:
     BACKUP_MYSQL_DB="myappdb"
     # or: BACKUP_PSQL_DB="myappdb"
     BACKUP_GPG_RECIPIENT="trustedperson@example.com"
+    BACKUP_ADMIN_EMAILS="admin-one@example.com,admin-two@example.com"
 
 Currently all variables have to be set for the script to run except for
 the SQL database variables, they are optional as most people will only
@@ -84,5 +86,7 @@ This configuration relies on the following also being configured:
       for `trustedperson@example.com`.
    3. The user must have a public SSH key which is in `~/.ssh/authorized_keys`
       on the `backupuser@example.com` account.
+   4. The 'mailx' program must be installed for administrators to be
+      notified about success or failure.
 
 That's all, folks!

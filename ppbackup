@@ -6,6 +6,7 @@ if [ "$BACKUP_NAME" = "" -o \
      "$BACKUP_REMOTE" = "" -o \
      "$BACKUP_GPG_RECIPIENT" = "" -o \
      "$BACKUP_FILES" = "" -o \
+     "$BACKUP_ADMIN_EMAILS" = "" -o \
      "$BACKUP_BINARIES" = "" ]
 then
     echo "Please configure ~/ppbackup.cfg and ~/.my.cnf"
@@ -61,6 +62,19 @@ rm -rf backups/$WEEK
 mkdir -p backups/$WEEK
 ln backups/$DAY/*sql* backups/$DAY/*files* backups/$WEEK
 
-# Push copy of encrypted backups to remote server
+# Push copy of encrypted backups to remote server and notify admin
 cd ~
-rsync -qar backups $BACKUP_REMOTE
+RSYNC_OUTPUT=$(rsync -qar backups $BACKUP_REMOTE 2>&1)
+RESULT=$?
+
+if [ $RESULT -eq 0 ]; then
+    SUBJECT="[ppbackup] Backup succeeded. Name \"$BACKUP_NAME\", destination \"$BACKUP_REMOTE\"."
+        MSG="The backup named \"$BACKUP_NAME\" appears to have succeeded. Note that this only means that the encrypted backups were copied successfully to the remote server. No integrity check has been performed on the backups themselves. It is wise to check up on them every once in a while by recovering a backup, to verify that the procedure works and that the necessary decryption keys are available to the appropriate personnel."
+else
+    SUBJECT="[ppbackup] BACKUP FAILED! Name \"$BACKUP_NAME\", destination \"$BACKUP_REMOTE\"!"
+        MSG="Backup has FAILED when sending backup named \"$BACKUP_NAME\" to destination \"$BACKUP_REMOTE\"! Please examine IMMEDIATELY!\n\nOutput from rsync: $RSYNC_OUTPUT"
+fi
+
+MSG="$MSG\n\nGPG recipient: $BACKUP_GPG_RECIPIENT"
+
+echo -e $MSG | mailx "$BACKUP_ADMIN_EMAILS" -s "$SUBJECT"
