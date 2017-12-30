@@ -69,10 +69,10 @@ RESULT=$?
 
 if [ $RESULT -eq 0 ]; then
     SUBJECT="[ppbackup] Backup succeeded. Name \"$BACKUP_NAME\", destination \"$BACKUP_REMOTE\"."
-        MSG="The backup named \"$BACKUP_NAME\" appears to have succeeded. Note that this only means that the encrypted backups were copied successfully to the remote server. No integrity check has been performed on the backups themselves. It is wise to check up on them every once in a while by recovering a backup, to verify that the procedure works and that the necessary decryption keys are available to the appropriate personnel."
+    MSG="The backup named \"$BACKUP_NAME\" appears to have succeeded. Note that this only means that the encrypted backups were copied successfully to the remote server. No integrity check has been performed on the backups themselves. It is wise to check up on them every once in a while by recovering a backup, to verify that the procedure works and that the necessary decryption keys are available to the appropriate personnel."
 else
     SUBJECT="[ppbackup] BACKUP FAILED! Name \"$BACKUP_NAME\", destination \"$BACKUP_REMOTE\"!"
-        MSG="Backup has FAILED when sending backup named \"$BACKUP_NAME\" to destination \"$BACKUP_REMOTE\"! Please examine IMMEDIATELY!\n\nOutput from rsync: $RSYNC_OUTPUT"
+    MSG="Backup has FAILED when sending backup named \"$BACKUP_NAME\" to destination \"$BACKUP_REMOTE\"! Please examine IMMEDIATELY!\n\nOutput from rsync: $RSYNC_OUTPUT"
 fi
 
 MSG="$MSG\n\nGPG recipient: $BACKUP_GPG_RECIPIENT"
