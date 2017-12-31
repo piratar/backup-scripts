@@ -77,4 +77,4 @@ fi
 
 MSG="$MSG\n\nGPG recipient: $BACKUP_GPG_RECIPIENT"
 
-echo -e $MSG | mailx "$BACKUP_ADMIN_EMAILS" -s "$SUBJECT"
+echo -e "$MSG" | mailx "$BACKUP_ADMIN_EMAILS" -s "$SUBJECT"
