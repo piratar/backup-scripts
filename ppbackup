@@ -22,7 +22,7 @@ TIME=$(date +%Hxx)
 cd ~
 rm -rf backups.insecure/latest
 mkdir -p backups/$DAY backups.insecure/latest
-find backups/$DAY -mtime +2 |xargs rm -f
+find backups/$DAY -type f -mtime +2 |xargs rm -f
 
 # Create initial backups, unencrypted
 if [ "$BACKUP_MYSQL_DB" != "" ]; then
@@ -53,14 +53,14 @@ for bkup in $BACKUP_NAME-mysql-$TIME.dump.bz2 \
             $BACKUP_NAME-files-$TIME.tar.bz2; do
   [ -e backups.insecure/latest/$bkup ] && \
     nice gpg --batch -e -r $BACKUP_GPG_RECIPIENT \
-      <backups.insecure/latest/$bkup 2>/dev/null \
+      <backups.insecure/latest/$bkup \
       >backups/$DAY/$bkup.gpg
 done
 
 # Create weekly backups; skipping the binaries to save space
 rm -rf backups/$WEEK
 mkdir -p backups/$WEEK
-ln backups/$DAY/*sql* backups/$DAY/*files* backups/$WEEK
+ln backups/$DAY/*sql* backups/$DAY/*files* backups/$WEEK 2>/dev/null
 
 # Push copy of encrypted backups to remote server and notify admin
 cd ~
