@@ -6,7 +6,6 @@ if [ "$BACKUP_NAME" = "" -o \
      "$BACKUP_REMOTE" = "" -o \
      "$BACKUP_GPG_RECIPIENT" = "" -o \
      "$BACKUP_FILES" = "" -o \
-     "$BACKUP_ADMIN_EMAILS" = "" -o \
      "$BACKUP_BINARIES" = "" ]
 then
     echo "Please configure ~/ppbackup.cfg and ~/.my.cnf"
@@ -75,6 +74,7 @@ else
     MSG="Backup has FAILED when sending backup named \"$BACKUP_NAME\" to destination \"$BACKUP_REMOTE\"! Please examine IMMEDIATELY!\n\nOutput from rsync: $RSYNC_OUTPUT"
 fi
 
-MSG="$MSG\n\nGPG recipient: $BACKUP_GPG_RECIPIENT"
-
-echo -e "$MSG" | mailx "$BACKUP_ADMIN_EMAILS" -s "$SUBJECT"
+if [ "$BACKUP_ADMIN_EMAILS" != "" ]; then
+    MSG="$MSG\n\nGPG recipient: $BACKUP_GPG_RECIPIENT"
+    echo -e "$MSG" | mailx "$BACKUP_ADMIN_EMAILS" -s "$SUBJECT"
+fi
