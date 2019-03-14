@@ -5,8 +5,7 @@
 if [ "$BACKUP_NAME" = "" -o \
      "$BACKUP_REMOTE" = "" -o \
      "$BACKUP_GPG_RECIPIENT" = "" -o \
-     "$BACKUP_FILES" = "" -o \
-     "$BACKUP_BINARIES" = "" ]
+     "$BACKUP_FILES" = "" ]
 then
     echo "Please configure ~/ppbackup.cfg and ~/.my.cnf"
     exit 1
@@ -41,9 +40,11 @@ tar c $BACKUP_FILES 2>/dev/null \
   |nice bzip2 \
   >backups.insecure/latest/$BACKUP_NAME-files-$TIME.tar.bz2
 
-tar c $BACKUP_BINARIES 2>/dev/null \
-  |nice bzip2 \
-  >backups.insecure/latest/$BACKUP_NAME-binaries-$TIME.tar.bz2
+if [ "$BACKUP_BINARIES" != "" ]; then
+  tar c $BACKUP_BINARIES 2>/dev/null \
+    |nice bzip2 \
+    >backups.insecure/latest/$BACKUP_NAME-binaries-$TIME.tar.bz2
+fi
 
 # Create encrypted copies
 for bkup in $BACKUP_NAME-mysql-$TIME.dump.bz2 \
