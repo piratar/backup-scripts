@@ -13,14 +13,26 @@ fi
 
 # Set time-related variables
 WEEK=$(date +wk%U)
-DAY=$(date +day%u)
+if [ "$ONLY_ONE_DAY" = "1" ]; then
+    # If we're only doing one day, we'll call it day zero.
+    DAY="day0"
+else
+    # Otherwise, we'll number the day by the current day of the week.
+    DAY=$(date +day%u)
+fi
 TIME=$(date +%Hxx)
 
 # Make room
 cd ~
 rm -rf backups.insecure/latest
+# If backup should only keep one day (due to size), then obliterate all older
+# backups first.
+if [ "$ONLY_ONE_DAY" = "1" ]; then
+    rm -rf backups/*
+else
+    find backups/$DAY -type f -mtime +2 |xargs rm -f
+fi
 mkdir -p backups/$DAY backups.insecure/latest
-find backups/$DAY -type f -mtime +2 |xargs rm -f
 
 # Create initial backups, unencrypted
 if [ "$BACKUP_MYSQL_DB" != "" ]; then
@@ -57,10 +69,13 @@ for bkup in $BACKUP_NAME-mysql-$TIME.dump.bz2 \
       >backups/$DAY/$bkup.gpg
 done
 
-# Create weekly backups; skipping the binaries to save space
-rm -rf backups/$WEEK
-mkdir -p backups/$WEEK
-ln backups/$DAY/*sql* backups/$DAY/*files* backups/$WEEK 2>/dev/null
+# Create weekly backups, unless we only want one day; skipping the binaries to
+# save space
+if [ "$ONLY_ONE_DAY" != 1 ]; then
+    rm -rf backups/$WEEK
+    mkdir -p backups/$WEEK
+    ln backups/$DAY/*sql* backups/$DAY/*files* backups/$WEEK 2>/dev/null
+fi
 
 # Push copy of encrypted backups to remote server and notify admin
 cd ~
