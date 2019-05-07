@@ -73,6 +73,11 @@ An example `~/ppbackup.cfg` file might look like this:
     BACKUP_GPG_RECIPIENT="trustedperson@example.com"
     BACKUP_ADMIN_EMAILS="admin-one@example.com,admin-two@example.com"
 
+    # This optional setting means that only one day of backups should
+    # be retained. Appropriate for large backups that do not require
+    # backups far into the past.
+    #ONLY_ONE_DAY=1
+
 Currently all variables have to be set for the script to run except for
 the SQL database variables, they are optional as most people will only
 be using one or the other (or neither). Note that the `BACKUP_BINARIES`
