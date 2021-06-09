@@ -78,11 +78,16 @@ An example `~/ppbackup.cfg` file might look like this:
     # backups far into the past.
     #ONLY_ONE_DAY=1
 
-Currently all variables have to be set for the script to run except for
+    # Optional limit to how large backups are allowed to become. The
+    # latest backup is not included in this limit, to guarantee at
+    # least one backup will always be made.
+    #BACKUP_LIMIT_MB=1024
+
+Currently most variables have to be set for the script to run except for
 the SQL database variables, they are optional as most people will only
 be using one or the other (or neither). Note that the `BACKUP_BINARIES`
-will only be preserved in daily backups, not in the more long-lived
-weeklies.
+is optional and will only be preserved in daily backups, not in the more
+long-lived weeklies.
 
 This configuration relies on the following also being configured:
 

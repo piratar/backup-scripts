@@ -32,6 +32,23 @@ if [ "$ONLY_ONE_DAY" = "1" ]; then
 else
     find backups/$DAY -type f -mtime +2 |xargs rm -f
 fi
+# Enforce size limits, if we have any
+backups_size() {
+  # Magic: Returns size of ~/bin if backups/ does not exist.
+  echo $(du -s -BM backups/ ~/bin 2>/dev/null |head -1 |cut -f1 -dM)
+}
+if [ "$BACKUP_LIMIT_MB" != "" ]; then
+  if [ "$(backups_size)" -gt $BACKUP_LIMIT_MB ]; then
+    # List backup files, sorted by age, oldest first
+    find backups/ -printf '%T@ %p\n' |sort -n |while read TS FN; do
+      if [ "$(backups_size)" -gt $BACKUP_LIMIT_MB ]; then
+        rm -f "$FN"
+      fi
+    done
+    rmdir backups/* 2>/dev/null
+  fi
+fi
+# These must exist
 mkdir -p backups/$DAY backups.insecure/latest
 
 # Create initial backups, unencrypted
