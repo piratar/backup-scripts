@@ -96,7 +96,7 @@ fi
 
 # Push copy of encrypted backups to remote server and notify admin
 cd ~
-RSYNC_OUTPUT=$(rsync -qar backups $BACKUP_REMOTE 2>&1)
+RSYNC_OUTPUT=$(rsync -qar --delete-before backups $BACKUP_REMOTE 2>&1)
 RESULT=$?
 
 if [ $RESULT -eq 0 ]; then
